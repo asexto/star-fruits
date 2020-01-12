@@ -270,10 +270,14 @@ namespace myTiles {
 `
 }
 scene.onHitWall(SpriteKind.Player, function (sprite) {
+    lifeLost()
+})
+function lifeLost () {
+    hero.startEffect(effects.fire)
     scene.cameraShake(4, 500)
     info.changeLifeBy(-1)
     startLevel()
-})
+}
 sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Enemy, function (sprite, otherSprite) {
     sprite.startEffect(effects.disintegrate, 300)
     sprite.destroy()
@@ -292,9 +296,7 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     }
 })
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSprite) {
-    scene.cameraShake(4, 500)
-    info.changeLifeBy(-1)
-    startLevel()
+    lifeLost()
 })
 function startLevel () {
     scene.setBackgroundImage(img`
@@ -446,7 +448,7 @@ f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
     for (let value of sprites.allOfKind(SpriteKind.Enemy)) {
         value.destroy()
     }
-    hero.setPosition(25, 60)
+    hero.setPosition(cameraX, 60)
 }
 let cherry: Sprite = null
 let cameraX = 0
@@ -468,6 +470,7 @@ hero = sprites.create(img`
 `, SpriteKind.Player)
 hero.setFlag(SpriteFlag.StayInScreen, true)
 hero.setFlag(SpriteFlag.DestroyOnWall, false)
+hero.z = 999
 controller.moveSprite(hero)
 scene.setBackgroundImage(img`
 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 
@@ -594,12 +597,15 @@ scene.setBackgroundImage(img`
 game.splash("Press fire to start")
 startLevel()
 game.onUpdate(function () {
-    hero.x += 1
     cameraX += 1
     scene.centerCameraAt(cameraX, hero.y)
+    if (cameraX > 0) {
+        hero.x += 1
+    }
 })
 game.onUpdateInterval(1000, function () {
-    cherry = sprites.create(img`
+    if (cameraX > 50) {
+        cherry = sprites.create(img`
 . . . 6 6 6 6 . 7 . . . . . 
 . . 7 7 7 7 7 7 7 . . . . . 
 . . . 6 6 6 6 . 7 7 . . . . 
@@ -615,7 +621,8 @@ game.onUpdateInterval(1000, function () {
 2 2 2 2 2 . . . . 2 2 2 2 2 
 . 2 2 2 . . . . . . 2 2 2 . 
 `, SpriteKind.Enemy)
-    cherry.setVelocity(15, 15)
-    cherry.setPosition(scene.cameraLeft() + scene.screenWidth(), scene.cameraTop() + Math.randomRange(0, scene.screenHeight()))
-    cherry.follow(hero)
+        cherry.setVelocity(15, 15)
+        cherry.setPosition(scene.cameraLeft() + scene.screenWidth(), scene.cameraTop() + Math.randomRange(0, scene.screenHeight()))
+        cherry.follow(hero)
+    }
 })

@@ -578,6 +578,11 @@ tiles.setTilemap(tiles.createTilemap(
             [myTiles.tile0,myTiles.tile1,myTiles.tile2,myTiles.tile3,myTiles.tile4,myTiles.tile5,myTiles.tile6,myTiles.tile7,myTiles.tile8,myTiles.tile9,myTiles.tile10,myTiles.tile11,myTiles.tile12,myTiles.tile13],
             TileScale.Sixteen
         ))
+let cameraX = 0
+game.onUpdate(function () {
+    cameraX += 1
+    scene.centerCameraAt(cameraX, 60)
+})
 game.onUpdateInterval(1000, function () {
     cherry = sprites.create(img`
 . . . 6 6 6 6 . 7 . . . . . 

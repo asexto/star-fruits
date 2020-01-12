@@ -269,6 +269,33 @@ namespace myTiles {
 4 4 4 4 4 4 4 4 4 4 4 4 4 2 2 2 
 `
 }
+scene.onHitWall(SpriteKind.Player, function (sprite) {
+    scene.cameraShake(4, 500)
+    info.changeLifeBy(-1)
+    startLevel()
+})
+sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Enemy, function (sprite, otherSprite) {
+    sprite.startEffect(effects.disintegrate, 300)
+    sprite.destroy()
+    otherSprite.destroy()
+    info.changeScoreBy(1)
+})
+controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
+    if (sprites.allOfKind(SpriteKind.Projectile).length < 3) {
+        projectile = sprites.createProjectileFromSprite(img`
+. 6 6 6 6 6 6 6 . 
+6 6 7 7 6 6 6 6 6 
+6 6 6 6 6 6 6 6 6 
+. 6 6 6 6 6 6 6 . 
+`, hero, 50, 0)
+        projectile.vx = 130
+    }
+})
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSprite) {
+    scene.cameraShake(4, 500)
+    info.changeLifeBy(-1)
+    startLevel()
+})
 function startLevel () {
     scene.setBackgroundImage(img`
 f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
@@ -421,34 +448,9 @@ f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
     }
     hero.setPosition(25, 60)
 }
-scene.onHitWall(SpriteKind.Player, function (sprite) {
-    info.changeLifeBy(-1)
-    startLevel()
-})
-sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Enemy, function (sprite, otherSprite) {
-    sprite.startEffect(effects.disintegrate, 300)
-    sprite.destroy()
-    otherSprite.destroy()
-    info.changeScoreBy(1)
-})
-controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (sprites.allOfKind(SpriteKind.Projectile).length < 3) {
-        projectile = sprites.createProjectileFromSprite(img`
-. 6 6 6 6 6 6 6 . 
-6 6 7 7 6 6 6 6 6 
-6 6 6 6 6 6 6 6 6 
-. 6 6 6 6 6 6 6 . 
-`, hero, 50, 0)
-        projectile.vx = 130
-    }
-})
-sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSprite) {
-    info.changeLifeBy(-1)
-    startLevel()
-})
 let cherry: Sprite = null
-let projectile: Sprite = null
 let cameraX = 0
+let projectile: Sprite = null
 let hero: Sprite = null
 hero = sprites.create(img`
 . . . . . 5 5 5 5 5 5 5 . . . . 
@@ -592,6 +594,7 @@ scene.setBackgroundImage(img`
 game.splash("Press fire to start")
 startLevel()
 game.onUpdate(function () {
+    hero.x += 1
     cameraX += 1
     scene.centerCameraAt(cameraX, hero.y)
 })
@@ -612,7 +615,7 @@ game.onUpdateInterval(1000, function () {
 2 2 2 2 2 . . . . 2 2 2 2 2 
 . 2 2 2 . . . . . . 2 2 2 . 
 `, SpriteKind.Enemy)
-    cherry.setVelocity(30, 30)
+    cherry.setVelocity(15, 15)
     cherry.setPosition(scene.cameraLeft() + scene.screenWidth(), scene.cameraTop() + Math.randomRange(0, scene.screenHeight()))
     cherry.follow(hero)
 })

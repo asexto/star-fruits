@@ -273,7 +273,6 @@ scene.onHitWall(SpriteKind.Player, function (sprite) {
     lifeLost()
 })
 function lifeLost () {
-    hero.startEffect(effects.fire)
     scene.cameraShake(4, 500)
     info.changeLifeBy(-1)
     startLevel()
@@ -285,7 +284,7 @@ sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Enemy, function (sprite, oth
     info.changeScoreBy(1)
 })
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (sprites.allOfKind(SpriteKind.Projectile).length < 3) {
+    if (sprites.allOfKind(SpriteKind.Projectile).length < 5) {
         projectile = sprites.createProjectileFromSprite(img`
 . 6 6 6 6 6 6 6 . 
 6 6 7 7 6 6 6 6 6 
@@ -444,11 +443,12 @@ f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
             [myTiles.tile0,myTiles.tile1,myTiles.tile2,myTiles.tile3,myTiles.tile4,myTiles.tile5,myTiles.tile6,myTiles.tile7,myTiles.tile8,myTiles.tile9,myTiles.tile10,myTiles.tile11,myTiles.tile12,myTiles.tile13],
             TileScale.Sixteen
         ))
-    cameraX = 0
     for (let value of sprites.allOfKind(SpriteKind.Enemy)) {
         value.destroy()
     }
-    hero.setPosition(cameraX, 60)
+    hero.setPosition(scene.screenWidth() / 2, scene.screenHeight() + 2)
+    cameraX = hero.x
+    scene.centerCameraAt(cameraX, hero.y)
 }
 let cherry: Sprite = null
 let cameraX = 0
@@ -597,14 +597,12 @@ scene.setBackgroundImage(img`
 game.splash("Press fire to start")
 startLevel()
 game.onUpdate(function () {
-    cameraX += 1
+    hero.x += 0.5
+    cameraX += 0.5
     scene.centerCameraAt(cameraX, hero.y)
-    if (cameraX > 0) {
-        hero.x += 1
-    }
 })
 game.onUpdateInterval(1000, function () {
-    if (cameraX > 50) {
+    if (cameraX > scene.screenWidth()) {
         cherry = sprites.create(img`
 . . . 6 6 6 6 . 7 . . . . . 
 . . 7 7 7 7 7 7 7 . . . . . 
@@ -621,7 +619,7 @@ game.onUpdateInterval(1000, function () {
 2 2 2 2 2 . . . . 2 2 2 2 2 
 . 2 2 2 . . . . . . 2 2 2 . 
 `, SpriteKind.Enemy)
-        cherry.setVelocity(15, 15)
+        cherry.setVelocity(0, 0)
         cherry.setPosition(scene.cameraLeft() + scene.screenWidth(), scene.cameraTop() + Math.randomRange(0, scene.screenHeight()))
         cherry.follow(hero)
     }
